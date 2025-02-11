@@ -1,0 +1,23 @@
+{
+    "name": "myomyintaung512/laravel-dinger-prebuilt",
+    "description": "Laravel package for Dinger Prebuilt Form payment integration",
+    "autoload": {
+        "psr-4": {
+            "myomyintaung512\\LaravelDingerPrebuilt\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Myo Myint Aung ( Juno )",
+            "email": "myomyintaung512@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.3|^8.0",
+        "guzzlehttp/guzzle": "^7.0",
+        "illuminate/support": "^8.0|^9.0|^10.0|^11.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0"
+    }
+}
