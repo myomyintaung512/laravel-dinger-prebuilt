@@ -12,6 +12,12 @@ composer require myomyintaung512/laravel-dinger
 
 ## Configuration
 
+First publish the configuration file:
+
+```bash
+php artisan vendor:publish --provider="myomyintaung512\LaravelDingerPrebuilt\DingerServiceProvider"
+```
+
 Add the following configuration to your .env file:
 
 ```env
