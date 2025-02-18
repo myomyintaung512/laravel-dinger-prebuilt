@@ -1,6 +1,6 @@
 <?php
 
-namespace myomyintaung512\LaravelDingerPrebuiltForm;
+namespace myomyintaung512\LaravelDingerPrebuilt;
 
 use phpseclib\Crypt\RSA;
 
