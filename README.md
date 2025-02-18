@@ -7,7 +7,7 @@ A Laravel package for integrating [Dinger](https://dinger.asia) payment gateway 
 You can install the package via composer:
 
 ```bash
-composer require myomyintaung512/laravel-dinger
+composer require myomyintaung512/laravel-dinger-prebuilt
 ```
 
 ## Configuration
@@ -35,6 +35,7 @@ DINGER_BASE_URL=https://prebuilt.dinger.asia
 You can use the Dinger instance in two ways:
 
 ### Using Dependency Injection
+
 ```php
 use myomyintaung512\LaravelDingerPrebuiltForm\DingerPrebuilt;
 
@@ -56,11 +57,12 @@ class PaymentController extends Controller
             1000,
             'ORDER_123'
         );
-        
+
         return redirect($paymentUrl);
     }
 }
 ```
+
 ```php
 use myomyintaung512\LaravelDinger\Dinger;
 
