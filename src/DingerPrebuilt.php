@@ -2,7 +2,8 @@
 
 namespace myomyintaung512\LaravelDingerPrebuilt;
 
-use phpseclib\Crypt\RSA;
+use phpseclib3\Crypt\RSA;
+use phpseclib3\Crypt\PublicKeyLoader;
 
 class DingerPrebuilt
 {
@@ -80,8 +81,18 @@ class DingerPrebuilt
         $ciphertext = $rsa->encrypt($data_pay);
         $value = base64_encode($ciphertext);
         $urlencode_value = urlencode($value);
+        $encryptedHashValue = hash_hmac('sha256', $data_pay, $this->hashKey);
+
+
+        $rsa = PublicKeyLoader::load($publicKey);
+        $rsa = $rsa->withPadding(RSA::ENCRYPTION_PKCS1);
+
+        $ciphertext = $rsa->encrypt($data_pay);
+        $value = base64_encode($ciphertext);
+        $urlencode_value = urlencode($value);
 
         $encryptedHashValue = hash_hmac('sha256', $data_pay, $this->hashKey);
+
 
         return $this->baseUrl . "/?hashValue=$encryptedHashValue&payload=$urlencode_value";
     }
