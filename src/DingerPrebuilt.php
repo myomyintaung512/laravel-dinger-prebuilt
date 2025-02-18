@@ -2,55 +2,87 @@
 
 namespace myomyintaung512\LaravelDingerPrebuiltForm;
 
+use phpseclib\Crypt\RSA;
+
 class DingerPrebuilt
 {
-    protected $apiKey;
-    protected $merchantName;
-    protected $merchantId;
-    protected $baseUrl;
-    protected $isProduction;
+    private $clientId;
+    private $merchantKey;
+    private $publicKey;
+    private $projectName;
+    private $merchantName;
+    private $baseUrl;
+    private $hashKey;
 
     public function __construct($config = [])
     {
-        $this->apiKey = $config['api_key'] ?? null;
-        $this->merchantName = $config['merchant_name'] ?? null;
-        $this->merchantId = $config['merchant_id'] ?? null;
-        $this->isProduction = $config['production'] ?? false;
-        $this->baseUrl = $this->isProduction
-            ? 'https://form.dinger.asia/api/'
-            : 'https://prebuilt.dinger.asia/api/';
+        if (!isset($config['clientId'])) {
+            throw new \InvalidArgumentException('clientId is required');
+        }
+        if (!isset($config['merchantKey'])) {
+            throw new \InvalidArgumentException('merchantKey is required');
+        }
+        if (!isset($config['publicKey'])) {
+            throw new \InvalidArgumentException('publicKey is required');
+        }
+        if (!isset($config['projectName'])) {
+            throw new \InvalidArgumentException('projectName is required');
+        }
+        if (!isset($config['merchantName'])) {
+            throw new \InvalidArgumentException('merchantName is required');
+        }
+        if (!isset($config['hashKey'])) {
+            throw new \InvalidArgumentException('hashKey is required');
+        }
+
+        $this->clientId = $config['clientId'];
+        $this->merchantKey = $config['merchantKey'];
+        $this->publicKey = $config['publicKey'];
+        $this->projectName = $config['projectName'];
+        $this->merchantName = $config['merchantName'];
+        $this->baseUrl = $config['baseUrl'] ?? 'https://prebuilt.dinger.asia';
+        $this->hashKey = $config['hashKey'];
     }
 
     public function createPayment(array $data)
     {
-        $payload = [
-            'merchantName' => $this->merchantName,
-            'merchantId' => $this->merchantId,
-            'amount' => $data['amount'],
-            'merchantOrderId' => $data['order_id'],
-            'productDesc' => $data['description'] ?? '',
-            'customerName' => $data['customer_name'] ?? '',
-            'customerPhone' => $data['customer_phone'] ?? '',
-            'customerEmail' => $data['customer_email'] ?? '',
-            'items' => $data['items'] ?? [],
-            'redirectUrl' => $data['redirect_url'] ?? '',
-        ];
+        $items_data = array_map(function ($item) {
+            return [
+                "name" => $item['name'],
+                "amount" => $item['amount'],
+                "quantity" => $item['quantity']
+            ];
+        }, $data['items'] ?? []);
 
-        return $this->makeRequest('POST', 'payment', $payload);
-    }
-
-    protected function makeRequest($method, $endpoint, $data = [])
-    {
-        $client = new \GuzzleHttp\Client();
-
-        $response = $client->request($method, $this->baseUrl . $endpoint, [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->apiKey,
-                'Content-Type' => 'application/json',
-            ],
-            'json' => $data,
+        $data_pay = json_encode([
+            "clientId" => $this->clientId,
+            "publicKey" => $this->publicKey,
+            "items" => json_encode($items_data),
+            "customerName" => $data['customer_name'] ?? '',
+            "totalAmount" => $data['amount'],
+            "merchantOrderId" => $data['order_id'],
+            "merchantKey" => $this->merchantKey,
+            "projectName" => $this->projectName,
+            "merchantName" => $this->merchantName
         ]);
 
-        return json_decode($response->getBody(), true);
+        $publicKey = '-----BEGIN PUBLIC KEY-----'
+            . 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFD4IL1suUt/TsJu6zScnvsEdL'
+            . 'PuACgBdjX82QQf8NQlFHu2v/84dztaJEyljv3TGPuEgUftpC9OEOuEG29z7z1uOw'
+            . '7c9T/luRhgRrkH7AwOj4U1+eK3T1R+8LVYATtPCkqAAiomkTU+aC5Y2vfMInZMgj'
+            . 'X0DdKMctUur8tQtvkwIDAQAB'
+            . '-----END PUBLIC KEY-----';
+
+        $rsa = new RSA();
+        $rsa->loadKey($publicKey);
+        $rsa->setEncryptionMode(2);
+
+        $ciphertext = $rsa->encrypt($data_pay);
+        $value = base64_encode($ciphertext);
+        $urlencode_value = urlencode($value);
+
+        $encryptedHashValue = hash_hmac('sha256', $data_pay, $this->hashKey);
+
+        return $this->baseUrl . "/?hashValue=$encryptedHashValue&payload=$urlencode_value";
     }
 }

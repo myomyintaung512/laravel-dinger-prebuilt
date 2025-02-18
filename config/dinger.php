@@ -1,8 +1,11 @@
 <?php
 
 return [
-    'api_key' => env('DINGER_API_KEY'),
+    'client_id' => env('DINGER_CLIENT_ID'),
+    'merchant_key' => env('DINGER_MERCHANT_KEY'),
+    'public_key' => env('DINGER_PUBLIC_KEY'),
+    'project_name' => env('DINGER_PROJECT_NAME'),
     'merchant_name' => env('DINGER_MERCHANT_NAME'),
-    'merchant_id' => env('DINGER_MERCHANT_ID'),
-    'production' => env('DINGER_PRODUCTION', false),
+    'hash_key' => env('DINGER_HASH_KEY'),
+    'base_url' => env('DINGER_BASE_URL', 'https://prebuilt.dinger.asia'),
 ];
