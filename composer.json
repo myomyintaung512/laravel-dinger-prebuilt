@@ -3,7 +3,8 @@
     "description": "Laravel package for Dinger Prebuilt Form payment integration",
     "autoload": {
         "psr-4": {
-            "myomyintaung512\\LaravelDingerPrebuilt\\": "src/"
+            "myomyintaung512\\LaravelDingerPrebuilt\\": "src/",
+            "myomyintaung512\\phpseclib\\": "lib/phpseclib/"
         }
     },
     "authors": [
@@ -15,8 +16,7 @@
     "require": {
         "php": "^7.3|^8.0",
         "guzzlehttp/guzzle": "^7.0",
-        "illuminate/support": "^8.0|^9.0|^10.0|^11.0",
-        "phpseclib/phpseclib": "~3.0"
+        "illuminate/support": "^8.0|^9.0|^10.0|^11.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.0"
